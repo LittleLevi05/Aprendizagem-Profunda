@@ -8,80 +8,105 @@ from dataset import Dataset
 import matplotlib.pyplot as plt
 
 class LogisticRegression:
-    
-    def __init__(self, dataset, standardize = False, regularization = False, lamda = 1):
-        if standardize:
-            dataset.standardize()
-            self.X = np.hstack ((np.ones([dataset.nrows(),1]), dataset.Xst ))
-            self.standardized = True
-        else:
-            self.X = np.hstack ((np.ones([dataset.nrows(),1]), dataset.X ))
-            self.standardized = False
-        self.y = dataset.Y
-        self.theta = self.theta = np.zeros(self.X.shape[1])
+
+    # Check
+    def __init__(self, regularization = False, optimize = False, lamda = 1, alpha = 0.01, iters = 10000):
+        self.theta = None
         self.regularization = regularization
+        self.optimize = optimize
         self.lamda = lamda
-        self.data = dataset
-            
+        self.alpha = alpha
+        self.iters = iters
+        self.X = None
+        self.Y = None
+         
+    # Check
     def printCoefs(self):
         print(self.theta)
 
+    # Check
     def probability(self, instance):
         x = np.empty([self.X.shape[1]])
         x[0] = 1
         x[1:] = np.array(instance[:self.X.shape[1]-1])
-        if self.standardized:
-            if np.all(self.sigma!= 0): 
-                x[1:] = (x[1:] - self.data.mu) / self.data.sigma
-            else: x[1:] = (x[1:] - self.mu) 
         return sigmoid(np.dot(self.theta,x))
 
-    def predict(self, instance):
+    # Check
+    def predict_sample(self, instance):
         p = self.probability(instance)
         if p >= 0.5: res = 1
         else: res= 0 
         return res
   
+    # Check
     def costFunction(self, theta = None):
-        if theta is None: theta= self.theta
+        if theta is None: theta = self.theta
         m = self.X.shape[0]
         # predictions
-        p = sigmoid ( np.dot(self.X, theta) )
+        p = sigmoid(np.dot(self.X,theta))
         # cost function
         cost = (-self.y * np.log(p) - (1-self.y) * np.log(1-p))
         res = np.sum(cost) / m
-        # return 
         return res
         
+    # Check
     def costFunctionReg(self, theta = None, lamda = 1):
         if theta is None: theta= self.theta
         m = self.X.shape[0]
         # predictions
-        # p = ...
+        p = sigmoid(np.dot(self.X,theta))
         # cost function
-        # cost = 
-        # return ...
+        cost = (-self.y * np.log(p) - (1-self.y) * np.log(1-p))
+        j = np.sum(cost) / m
+        regTerm = (np.sum(np.square(self.theta))) * (self.lamda / (2 * self.X.shape[0]))
+        res = j + regTerm
+        return res
 
-
-    def gradientDescent(self, dataset, alpha = 0.01, iters = 10000):
+    # Check
+    def gradientDescent(self, alpha = 0.01, iters = 10000):
         m = self.X.shape[0]
         n = self.X.shape[1]
         self.theta = np.zeros(n)  
         for its in range(iters):
             J = self.costFunction()
-            if its%1000 == 0: print(J)
+            # if its%1000 == 0: print(J)
             # delta 
             delta = self.X.T.dot(sigmoid(self.X.dot(self.theta)) - self.y)
             # self.theta 
             self.theta -= (alpha/m * delta)
             
+    # Check
+    def gradientDescentReg(self, alpha = 0.01, iters = 10000):
+        m = self.X.shape[0]
+        n = self.X.shape[1]
+        self.theta = np.zeros(n)  
+        for its in range(iters):
+            J = self.costFunctionReg()
+            # if its%1000 == 0: print(J)
+            # delta 
+            delta = self.X.T.dot(sigmoid(self.X.dot(self.theta)) - self.y)
+            # self.theta 
+            self.theta -= (alpha/m * delta)
             
-    def buildModel(self, dataset):
+    # Check
+    def train(self, x_train, y_test):
+        
+        self.X = np.hstack((np.ones([x_train.shape[0],1]), x_train)) 
+        self.y = y_test
+        self.theta = np.zeros(self.X.shape[1])
+        
         if self.regularization:
-            self.optim_model()
+            if self.optimize: 
+                self.optim_model_reg(self.lamda)
+            else:
+                self.gradientDescentReg(self.alpha, self.iters)
         else:
-            self.optim_model_reg(self.lamda)
+            if self.optimize:
+                self.optim_model()
+            else:
+                self.gradientDescent(self.alpha, self.iters)
 
+    # Check
     def optim_model(self):
         from scipy import optimize
 
@@ -90,6 +115,7 @@ class LogisticRegression:
         initial_theta = np.zeros(n)
         self.theta, _, _, _, _ = optimize.fmin(lambda theta: self.costFunction(theta), initial_theta, **options)
     
+    # Check
     def optim_model_reg(self, lamda):
         from scipy import optimize
 
@@ -97,7 +123,6 @@ class LogisticRegression:
         initial_theta = np.ones(n)        
         result = optimize.minimize(lambda theta: self.costFunctionReg(theta, lamda), initial_theta, method='BFGS', options={"maxiter":500, "disp":False} )
         self.theta = result.x    
-  
 
     def mapX(self):
         self.origX = self.X.copy()
@@ -144,6 +169,22 @@ class LogisticRegression:
         plt.contour( u, v, z, [0.0, 0.001])
         plt.show()
 
+    # Check
+    def predict(self, samples):
+        result = []
+        for sample in samples:
+            result.append(self.predict_sample(sample))
+        return np.array(result)
+    
+    # Check
+    def accuracy(self, y_true, y_pred):
+        i = 0
+        hits = 0
+        for pred in y_pred:
+            if pred == y_true[i]:
+                hits = hits + 1
+        i = i + 1
+        return (hits / len(y_true)) * 100    
 
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
@@ -161,41 +202,170 @@ def mapFeature(X1, X2, degrees = 6):
   
 
 # main - tests
-def test():
-    ds= Dataset("log-ex1.data")   
-    logmodel = LogisticRegression(ds)
-    ds.plotBinaryData()    
-    print ("Initial cost: ", logmodel.costFunction())
-    # result: 0.693
 
-    logmodel.gradientDescent(ds, 0.002, 200000)
+def testGrad():
+    ds = Dataset("hearts-bin.data")
+    print("> Realizando split do dataset ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
     
-    #logmodel.optim_model()
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.0005, iters=200000)
     
-    logmodel.plotModel()
-    print ("Final cost:", logmodel.costFunction())
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
     
-    ex = np.array([45,65])
-    print ("Prob. example:", logmodel.probability(ex))
-    print ("Pred. example:", logmodel.predict(ex))
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
     
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
 
-def testreg():
-    ds= Dataset("log-ex2.data")   
-       
-    logmodel = LogisticRegression(ds)
-    logmodel.plotData()
-    logmodel.mapX()
-    logmodel.printCoefs()
-
-    print (logmodel.costFunction())
-    logmodel.optim_model_reg(0.1)
-    logmodel.printCoefs()
-    print (logmodel.costFunction())
-    logmodel.plotModel2()    
+    print("> accuracy: ", accuracy)
     
+def testGradReg():
+    ds = Dataset("hearts-bin.data")
+    print("> Realizando split do dataset ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization= True, optimize=False, alpha=0.0005, iters=200000)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
 
+    print("> accuracy: ", accuracy)
+    
+def testOpt():
+    ds = Dataset("hearts-bin.data")
+    print("> Realizando split do dataset ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization= False, optimize=True)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+    
+def testOptReg():
+    ds = Dataset("hearts-bin.data")
+    print("> Realizando split do dataset ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization= True, optimize= False)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+
+def testAlgorithms():
+    print("> Iniciando Gradiente Descendente sem métodos sofisticados e sem regulariação ... ")
+    testGrad()
+    print("> ---------------------------------------")
+    print("> Iniciando Gradiente Descendente sem métodos sofisticados e com regulariação ... ")
+    testGradReg()
+    print("> ---------------------------------------")
+    print("> Iniciando Gradiente Descendente com métodos sofisticados e sem regulariação ... ")
+    testOpt()
+    print("> ---------------------------------------")
+    print("> Iniciando Gradiente Descendente com métodos sofisticados e com regulariação ... ")
+    testOptReg()
+   
+def testSplit(): 
+    ds = Dataset("log-ex1.data")
+    print("> Realizando split do dataset com 80% para treino ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+    
+    ds = Dataset("log-ex1.data")
+    print("> Realizando split do dataset com 70% para treino ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.3, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+    
+    ds = Dataset("log-ex1.data")
+    print("> Realizando split do dataset com 60% para teste ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.4, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+    
+    ds = Dataset("log-ex1.data")
+    print("> Realizando split do dataset com 50% para treino ... ")
+    x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.5, random_state=2023)
+    
+    print("> Inicializando modelo  ... ")
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
+    
+    print("> Treinando o modelo com os dados de treino ... ")
+    logmodel.train(x_train=x_train,y_test=y_train)
+    
+    print("> Realizando as previsões dos dados de teste ... ")
+    y_pred = logmodel.predict(x_test)
+    
+    print("> Calculando accuracy ... ")
+    accuracy = logmodel.accuracy(y_test,y_pred)
+
+    print("> accuracy: ", accuracy)
+   
 if __name__ == '__main__':
-    test()
-    #testreg()
+    testAlgorithms()
+    # testSplit()
 

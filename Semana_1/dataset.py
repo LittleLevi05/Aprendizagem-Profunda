@@ -66,7 +66,7 @@ class Dataset:
         
     def train_test_split(self, test_size, random_state):
         np.random.seed(random_state)
-        test_indexes = np.random.choice(range(self.X.shape[0]),floor(len(self.X)/test_size))
+        test_indexes = np.random.choice(range(self.X.shape[0]),floor(len(self.X)*test_size),replace=False)
         train_indexes = [x for x in range(self.X.shape[0]) if x not in test_indexes ]
         x_train = self.X[train_indexes, :]
         x_test = self.X[test_indexes, :]
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         d = Dataset("lr-example1.data")
         d.plotData2vars("Population", "Profit")
         # print(d.getXy())
-        d.train_test_split(4,4)
+        # d.train_test_split(4,4)
     
     def testStandardized():
         d = Dataset("lr-example1.data")
