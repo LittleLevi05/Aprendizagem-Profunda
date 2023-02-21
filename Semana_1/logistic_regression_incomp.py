@@ -89,10 +89,10 @@ class LogisticRegression:
             self.theta -= (alpha/m * delta)
             
     # Check
-    def train(self, x_train, y_test):
+    def train(self, x_train, y_train):
         
         self.X = np.hstack((np.ones([x_train.shape[0],1]), x_train)) 
-        self.y = y_test
+        self.y = y_train
         self.theta = np.zeros(self.X.shape[1])
         
         if self.regularization:
@@ -209,10 +209,10 @@ def testGrad():
     x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
     
     print("> Inicializando modelo  ... ")
-    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.0005, iters=200000)
+    logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.05, iters=10000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -228,10 +228,10 @@ def testGradReg():
     x_train, x_test, y_train, y_test = ds.train_test_split(test_size=0.2, random_state=2023)
     
     print("> Inicializando modelo  ... ")
-    logmodel = LogisticRegression(regularization= True, optimize=False, alpha=0.0005, iters=200000)
+    logmodel = LogisticRegression(regularization= True, optimize=False, alpha=0.05, iters=10000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -250,7 +250,7 @@ def testOpt():
     logmodel = LogisticRegression(regularization= False, optimize=True)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -269,7 +269,7 @@ def testOptReg():
     logmodel = LogisticRegression(regularization= True, optimize= False)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -301,7 +301,7 @@ def testSplit():
     logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -319,7 +319,7 @@ def testSplit():
     logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -337,7 +337,7 @@ def testSplit():
     logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
@@ -355,7 +355,7 @@ def testSplit():
     logmodel = LogisticRegression(regularization=False, optimize=False, alpha=0.005, iters=200000)
     
     print("> Treinando o modelo com os dados de treino ... ")
-    logmodel.train(x_train=x_train,y_test=y_train)
+    logmodel.train(x_train=x_train,y_train=y_train)
     
     print("> Realizando as previsões dos dados de teste ... ")
     y_pred = logmodel.predict(x_test)
