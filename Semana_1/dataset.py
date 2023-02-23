@@ -72,7 +72,9 @@ class Dataset:
         x_test = self.X[test_indexes, :]
         y_train = self.Y[train_indexes]
         y_test = self.Y[test_indexes]
-        return x_train, x_test, y_train, y_test
+        dataset_train = Dataset(X=x_train,Y=y_train)
+        dataset_test = Dataset(X=x_test,Y=y_test)
+        return dataset_train, dataset_test
     
 if __name__ == "__main__":
     def test():
