@@ -3,7 +3,7 @@
 Criação duma versão própria do algoritmo de *Machine Learning* de **Regressão Logística**.
 
 
-![enter image description here](https://raw.githubusercontent.com/henriqueparola/Aprendizagem-Profunda/main/Semana_1/images/banner.png)
+![enter image description here](https://raw.githubusercontent.com/henriqueparola/Aprendizagem-Profunda/main/Semana_2/images/banner.png)
 ### Descrição
 De maneira semelhante ao módulo **LogisticRegression** do *sklearn.linear_model*, foi concebido em Python as funcionalidades de tal algortimo, assentando-se somente na biblioteca *NumPy*.  Deste modo foi preciso a criação de duas classes:
 * **Dataset**: a partir de um ficheiro formatado por delimitadores (como um ficheiro csv), são armazenadas as variáveis independentes na instância X (*features* do dataset) e a variável dependente na instância **Y** (*target* a ser previsto, assumindo-se como sendo a última coluna do dataset), representadas na forma de *array* multidimensional do NumPy (ndarray). Para além disto, tal classe fornece duas importantes funcionalidades:
