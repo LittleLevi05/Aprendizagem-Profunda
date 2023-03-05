@@ -1,0 +1,11 @@
+{
+    "dataset": [
+        "The following results, as seen in Figures 2,3 and 4, were \nachieved when a GAN based model was trained on a dataset \nconsisting of Bach\u2019s musical symphonies.",
+        "Pitch vs Time representation of dataset used for random interpolation  \nFollowing the training of the model using this data, the time \ninterval for random interpolation between instruments was set \nas 5 (sec/instrum ent) and constant Q -spectrogram of the \ngenerated music was obtained.  \nFig.",
+        "Constant -Q spectrogram of generated music  \nThus, from our dataset, we were able to randomly subsample, \ninterpolate and generate 656 samples."
+    ],
+    "architecture": [
+        "But this \narchitecture is trained  on a fixed number of chords and is \nthus unable t o create a more diverse combination of notes.",
+        "2. Representation of musical waveforms  \nHere, we have used random interpolation to generate music on \na scaled  GAN  architecture."
+    ]
+}
