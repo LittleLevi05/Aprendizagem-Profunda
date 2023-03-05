@@ -3,6 +3,7 @@ from layer import Layer
 import numpy as np
 from dataset import Dataset
 
+# Test different number of hidden nodes and layers
 def testBuildModel():
     ds = Dataset("xnor.data")
     print("> Initializing model ...")
@@ -42,4 +43,4 @@ def testXOR():
 
 if __name__ == '__main__':
     testXOR()
-    testBuildModel()
+    #testBuildModel()
