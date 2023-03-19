@@ -1,4 +1,4 @@
-# Semana 1
+# Semana 3
 
 Criação duma versão própria de uma *Deep Neuronal Network*.
 
